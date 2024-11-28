@@ -5,22 +5,16 @@
     mode="inline"
   >
     <a-menu-item key="admin-dashboard">
-      <router-link class="text-decoration-none"  :to="{ name: 'admin-dashboard' }">
+      <router-link
+        class="text-decoration-none"
+        :to="{ name: 'admin-dashboard' }"
+      >
         <span>
-          <HomeOutlined class="me-1"/>
+          <HomeOutlined class="me-1" />
           Trang chủ
         </span>
       </router-link>
     </a-menu-item>
-    <a-menu-item key="users-register">
-      <router-link class="text-decoration-none" :to="{ name: 'users-register' }">
-        <span>
-          <UserAddOutlined class="me-1"/>
-          Thêm nhân viên
-        </span>
-      </router-link>
-    </a-menu-item>
-
     <a-menu-item key="admin-users">
       <router-link class="text-decoration-none" :to="{ name: 'admin-users' }">
         <span>
@@ -30,10 +24,24 @@
       </router-link>
     </a-menu-item>
     <a-menu-item key="admin-departments">
-      <router-link class="text-decoration-none" :to="{ name: 'admin-departments' }">
+      <router-link
+        class="text-decoration-none"
+        :to="{ name: 'admin-departments' }"
+      >
         <span>
-          <UserOutlined class="me-1" />
+          <ApartmentOutlined class="me-1" />
           Quản lý phòng ban
+        </span>
+      </router-link>
+    </a-menu-item>
+    <a-menu-item key="admin-projects">
+      <router-link
+        class="text-decoration-none"
+        :to="{ name: 'admin-projects' }"
+      >
+        <span>
+          <i class="fa-solid fa-list-check"></i>
+          Quản lý Dự án
         </span>
       </router-link>
     </a-menu-item>
@@ -42,24 +50,28 @@
 
 
 <script>
-import { defineComponent } from "vue";
-import { UserAddOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons-vue';
-import { storeToRefs } from "pinia";
-import { useMenu } from "../stores/use-menu.js";
+import { defineComponent } from 'vue'
+import {
+  HomeOutlined,
+  UserOutlined,
+  ApartmentOutlined,
+} from '@ant-design/icons-vue'
+import { storeToRefs } from 'pinia'
+import { useMenu } from '../stores/use-menu.js'
 export default defineComponent({
   setup() {
-    const store = useMenu();
+    const store = useMenu()
 
     return {
       ...storeToRefs(store),
-    };
+    }
   },
   components: {
-      HomeOutlined,
-      UserAddOutlined,
-      UserOutlined,
-      }
-});
+    HomeOutlined,
+    UserOutlined,
+    ApartmentOutlined,
+  },
+})
 </script>
 
 

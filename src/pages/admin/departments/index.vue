@@ -1,43 +1,38 @@
 <template>
-  <a-card title="Tài khoản" style="width: 100%">
+  <a-card title="Phòng ban" style="width: 100%">
     <div class="row mb-3">
-      <!-- <div class="col-12 justify-content-end d-flex">
+      <div class="col-12 justify-content-end d-flex">
         <a-button type="primary">
-          <router-link :to="{ name: 'admin-users-create' }">
-            <i class="fa-solid fa-user-plus"></i>
+          <router-link :to="{ name: 'admin-departments-create' }">
+            <i class="fa-solid fa-plus"></i>
           </router-link>
         </a-button>
-      </div> -->
+      </div>
     </div>
     <div class="row">
       <div class="col-12">
         <!-- scroll khi màn hình bé quá 576  -->
-        <a-table :dataSource="users" :columns="columns" :scroll="{ x: 576 }">
+        <a-table
+          :dataSource="departments"
+          :columns="columns"
+          :scroll="{ x: 576 }"
+        >
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
             </template>
 
-            <template v-if="column.key === 'is_active'">
-              <span v-if="record.is_active == 1" class="text-primary">
-                Kích hoạt
-              </span>
-              <span v-else-if="record.is_active !== 1" class="text-danger">
-                Bị khóa
-              </span>
-            </template>
-
             <template v-if="column.key === 'action'">
               <router-link
-                :to="{ name: 'admin-users-edit', params: { id: record.id } }"
+                :to="{
+                  name: 'admin-departments-edit',
+                  params: { id: record.id },
+                }"
               >
                 <a-button type="primary" class="me-sm-2 mb-2 mb-sm-0">
                   <i class="fa-regular fa-pen-to-square"></i>
                 </a-button>
               </router-link>
-              <a-button type="primary" danger @click="confirmDelete(record.id)">
-                <i class="fa-solid fa-trash"></i>
-              </a-button>
             </template>
           </template>
         </a-table>
@@ -47,101 +42,51 @@
 </template>
   
   <script>
-import { defineComponent, ref } from "vue";
-import { useMenu } from "../../../stores/use-menu.js";
-import { Modal, message } from "ant-design-vue";
-import useAxiosStore from "../../../stores/use-axios";
+import { defineComponent, ref } from 'vue'
+import { useMenu } from '../../../stores/use-menu.js'
+import useAxiosStore from '../../../stores/use-axios'
+import { onMounted } from 'vue'
 
 export default defineComponent({
-  created() {
-    const token = localStorage.getItem("accessToken");
-
-    if (!token) {
-      this.$router.push({ name: "admin-login" }); // Điều hướng về login nếu không có token
-    }
-  },
   setup() {
-    const store = useMenu();
-    store.onSelectedKeys(["admin-users"]);
+    const store = useMenu()
+    store.onSelectedKeys(['admin-departments'])
 
-    const users = ref([]);
+    const departments = ref([])
     const columns = [
-      { title: "#", key: "index" },
-      { title: "Mã nhân viên", key: "employee_code", dataIndex: "employee_code" },
-      { title: "Tài khoản", dataIndex: "name", key: "name" },
-      { title: "email", dataIndex: "email", key: "email" },
-      { title: "Thêm bởi", dataIndex: "created_by_name", key: "created_by_name" },
-      { title: "Trạng thái tài khoản", key: "is_active" },
-      { title: "Phòng ban", dataIndex: "name_department", key: "name_department" },
-      { title: "Công cụ", key: "action", fixed: "right" },
-    ];
+      { title: '#', key: 'index' },
+      { title: 'Mã Phòng Ban', key: 'code', dataIndex: 'code' },
+      { title: 'Tên Phòng Ban', dataIndex: 'description', key: 'description' },
+      { title: 'Công cụ', key: 'action', fixed: 'right' },
+    ]
 
-    const axiosStore = useAxiosStore();
+    const axiosStore = useAxiosStore()
 
     // Lấy token từ localStorage
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem('accessToken')
     // Lấy store axios và khởi tạo axios với token nếu có
     if (token) {
-      axiosStore.initializeAxios(token); // Cấu hình axios với token
+      axiosStore.initializeAxios(token) // Cấu hình axios với token
     }
 
-    const getUsers = async () => {
+    const getDepartments = async () => {
       try {
-        const response = await axiosStore.axiosInstance.get("/users");
-        users.value = response.data;
-        // Xử lý khi thành công
-        console.log(response);
+        const response = await axiosStore.axiosInstance.get('/departments')
+        departments.value = response.data
       } catch (error) {
         // Xử lý khi bị lỗi
-        console.log(error);
+        console.log(error)
       }
-    };
+    }
 
-    // Hàm xử lý xóa user
-    const deleteUser = (id) => {
-      axiosStore.axiosInstance
-        .delete(`/users/delete/${id}`)
-        .then((response) => {
-          if (response.status === 200) {
-            message.success("Xóa người dùng thành công");
-            getUsers(); // Cập nhật lại danh sách người dùng
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          message.error("Xóa người dùng thất bại");
-        });
-    };
-
-    // Xác nhận trước khi xóa
-    const confirmDelete = (id) => {
-      Modal.confirm({
-        title: "Bạn có chắc chắn muốn xóa người dùng này?",
-        okText: "Xóa",
-        okType: "danger",
-        cancelText: "Hủy",
-        onOk: () => {
-          deleteUser(id);
-        },
-      });
-    };
-    getUsers();
+    onMounted(() => {
+      getDepartments()
+    })
 
     return {
-      users,
-      columns,
-      confirmDelete, // Xuất hàm xóa để sử dụng trong template
-    };
+      departments,
+      columns, // Xuất hàm xóa để sử dụng trong template
+    }
   },
-});
+})
 </script>
-
-<style>
-.text-primary {
-  color: #007bff; /* Xanh */
-}
-
-.text-danger {
-  color: #dc3545; /* Đỏ */
-}
-</style>

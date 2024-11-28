@@ -24,6 +24,7 @@ const admin = [
                 component: () => import("../pages/admin/users/index.vue"),
                 meta: { requiresAuth: true }, // Cần đăng nhập mới có thể vào
             },
+
             {
                 path: "users/edit/:id",
                 name: "admin-users-edit",
@@ -33,6 +34,25 @@ const admin = [
                 path: "departments",
                 name: "admin-departments",
                 component: () => import("../pages/admin/departments/index.vue"),
+                meta: { requiresAuth: true }, // Cần đăng nhập mới có thể vào
+            },
+            {
+                path: "departments/create",
+                name: "admin-departments-create",
+                component: () => import("../pages/admin/departments/create.vue"),
+                meta: { requiresAuth: true }, // Cần đăng nhập mới có thể vào
+            },
+            {
+                path: "departments/edit/:id",
+                name: "admin-departments-edit",
+                component: () => import("../pages/admin/departments/edit.vue"),
+                meta: { requiresAuth: true }, // Cần đăng nhập mới có thể vào
+            },
+
+            {
+                path: "projects",
+                name: "admin-projects",
+                component: () => import("../pages/admin/projects/index.vue"),
                 meta: { requiresAuth: true }, // Cần đăng nhập mới có thể vào
             },
         ]

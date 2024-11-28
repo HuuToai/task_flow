@@ -1,6 +1,6 @@
 <template>
-  <form @submit.prevent="updateDepartment()">
-    <a-card title="Cập nhật tài khoản" style="width: 100%">
+  <form @submit.prevent="createDepartmenst()">
+    <a-card title="Tạo mới tài khoản" style="width: 100%">
       <div class="row">
         <div class="col-12 col-sm-12">
           <div class="row mb-3">
@@ -67,101 +67,84 @@
             type="primary"
             danger
             ghost
-            @click="$router.push({ name: 'admin-despartments' })"
+            @click="$router.push({ name: 'admin-deparments' })"
           >
             <span>Hủy</span>
           </a-button>
           <a-button type="primary" html-type="submit">
-            <span>Cập nhật</span>
+            <span>Lưu</span>
           </a-button>
         </div>
       </div>
     </a-card>
   </form>
 </template>
-  
   <script>
-import { defineComponent, ref, reactive, toRefs } from 'vue'
-import { message } from 'ant-design-vue'
-import { useMenu } from '../../../stores/use-menu.js'
-import { useRouter } from 'vue-router'
-import { useRoute } from 'vue-router'
-import { onMounted } from 'vue'
-import useAxiosStore from '../../../stores/use-axios'
-import ErrorMessage from '../../../components/ErrorMessage.vue'
-import { useErrorStore } from '../../../stores/use-erorrs.js'
-import { computed } from 'vue'
+import { defineComponent, reactive, toRefs } from "vue";
+import { message } from "ant-design-vue";
+import { useMenu } from "../../../stores/use-menu.js";
+import { useRouter } from "vue-router";
+import useAxiosStore from "../../../stores/use-axios";
+import ErrorMessage from "../../../components/ErrorMessage.vue";
+import { useErrorStore } from "../../../stores/use-erorrs.js";
+import { computed } from "vue";
 
 export default defineComponent({
   components: { ErrorMessage },
 
   setup() {
-    const store = useMenu()
-    store.onSelectedKeys(['admin-departments'])
-    const router = useRouter()
-    const route = useRoute()
-    const errorStore = useErrorStore()
-    const errors = computed(() => errorStore.errors)
+    const errorStore = useErrorStore();
+    const errors = computed(() => errorStore.errors);
+
+    const store = useMenu();
+    store.onSelectedKeys(["admin-departments"]);
+    const router = useRouter();
+
     const departments = reactive({
       code: '',
       description: '',
     })
 
-    const token = localStorage.getItem('accessToken')
-    const axiosStore = useAxiosStore()
+    const token = localStorage.getItem("accessToken");
+    const axiosStore = useAxiosStore();
     if (token) {
-      axiosStore.initializeAxios(token)
-    }
-    const getDepartments = async () => {
-      try {
-        const response = await axiosStore.axiosInstance.get(
-          `/departments/edit/${route.params.id}`
-        )
-        departments.code = response.data.code
-        departments.description = response.data.description
-      } catch (error) {
-        console.error('Lỗi khi lấy phòng ban:', error)
-      }
+      axiosStore.initializeAxios(token);
     }
 
-    // Phương thức để chuyển mã phòng ban thành chữ in hoa
-    const uppercaseCode = () => {
-      departments.code = departments.code.toUpperCase()
-    }
-    const updateDepartment = () => {
-      // Xóa tất cả lỗi trước khi kiểm tra lại
-      errorStore.clearAllErrors()
-
-      axiosStore.axiosInstance
-        .put(`/departments/update/${route.params.id}`, departments)
-        .then((response) => {
-          if (response.status == 200) {
-            message.success('Cập nhật thành công')
-            router.push({ name: 'admin-departments' })
-          }
-        })
-        .catch((error) => {
-          const serverErrors = error.response.data.errors
-
-          // Duyệt qua từng trường bị lỗi và set vào errorStore
-          Object.keys(serverErrors).forEach((field) => {
-            // Lấy thông báo lỗi đầu tiên từ mảng lỗi của trường
-            const errorMessage = serverErrors[field][0]
-            errorStore.setError(field, errorMessage) // Đặt lỗi vào store
+    const createDepartmenst = () => {
+      errorStore.clearAllErrors(); // Xóa toàn bộ lỗi trước đó
+        axiosStore.axiosInstance
+          .post("/departments/store", departments)
+          .then((response) => {
+            if (response.status == 201) {
+              message.success(response.data.message);
+              router.push({ name: "admin-departments" });
+            }
           })
-        })
-    }
-    // Gửi request khi component được mount
-    onMounted(() => {
-      getDepartments()
-    })
+          .catch((error) => {
+            if (error.response && error.response.data.errors) {
+              // Lấy các lỗi từ phản hồi server
+              const serverErrors = error.response.data.errors;
+
+              // Duyệt qua từng trường bị lỗi và set vào errorStore
+              Object.keys(serverErrors).forEach((field) => {
+                // Lấy thông báo lỗi đầu tiên từ mảng lỗi của trường
+                const errorMessage = serverErrors[field][0];
+                errorStore.setError(field, errorMessage); // Đặt lỗi vào store
+              });
+            } else {
+              // Xử lý lỗi chung nếu server không trả về cấu trúc lỗi mong đợi
+              message.error(error.response.data.message);
+            }
+          });
+    };
     return {
       ...toRefs(departments),
       errors,
-      updateDepartment,
-    }
+      createDepartmenst,
+    };
   },
-})
+});
 </script>
   
   <style>
