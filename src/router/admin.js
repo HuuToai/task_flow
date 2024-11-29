@@ -48,13 +48,13 @@ const admin = [
                 component: () => import("../pages/admin/departments/edit.vue"),
                 meta: { requiresAuth: true }, // Cần đăng nhập mới có thể vào
             },
-
             {
                 path: "projects",
                 name: "admin-projects",
                 component: () => import("../pages/admin/projects/index.vue"),
                 meta: { requiresAuth: true }, // Cần đăng nhập mới có thể vào
             },
+            
         ]
     },
     {
