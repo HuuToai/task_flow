@@ -8,7 +8,7 @@ import { useRouter } from "vue-router";
 export default function useAxiosStore() {
   const router = useRouter();
   const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api",
+    baseURL: import.meta.env.VITE_API_URL || "http://taskflow.local/api",
     headers: { "Content-Type": "application/json" },
   });
 
