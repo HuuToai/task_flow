@@ -62,7 +62,13 @@ const admin = [
         path: "/admin/login",
         name: "admin-login",
         component: () => import("../pages/admin/users/login.vue"),
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        name: "not-found",
+        component: () => import("../pages/404.vue"),
     }
+    
 ];
 
 export default admin;
